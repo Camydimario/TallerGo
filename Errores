@@ -1,0 +1,200 @@
+//dividir
+
+package main
+
+import (
+	"errors"
+	"fmt"
+)
+
+func Dividir(a, b float64) (float64, error) {
+
+	dividendo := a
+	divisor := b
+	if divisor == 0 {
+		return 0, errors.New("Division por cero, no es valido")
+	}
+	resultado := dividendo / divisor
+
+	return resultado, nil
+}
+
+func main() {
+
+	resultado, err := Dividir(20, 2)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+	fmt.Print(err, resultado)
+}
+
+//clasificar
+package main
+
+import (
+	"errors"
+	"fmt"
+)
+
+func ClasificarEdad(edad int) (string, error) {
+
+	if edad < 0 {
+		return "", errors.New("esa edad no existe")
+	}
+
+	if edad >= 18 {
+
+		return "adulto", nil
+	}
+	if edad >= 12 {
+		return "adolescente", nil
+	}
+	if edad >= 0 {
+		return "nino", nil
+	}
+
+	return "", nil
+}
+
+func main() {
+	categoria, err := ClasificarEdad(20)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+	fmt.Println("Resultado:", categoria)
+}
+
+
+//buscarProductos
+package main
+
+import (
+	"errors"
+	"fmt"
+)
+
+type Producto struct {
+	Codigo int
+	Nombre string
+}
+
+var ErrProductoNoEncontrado = errors.New("producto no encontrado")
+
+func BuscarProducto(productos []Producto, codigo int) (Producto, error) {
+	for _, p := range productos {
+		if p.Codigo == codigo {
+			return p, nil
+		}
+
+	}
+
+	return Producto{}, ErrProductoNoEncontrado
+}
+
+func main() {
+	productos := []Producto{
+
+		{Codigo: 123, Nombre: "tomate"},
+		{Codigo: 456, Nombre: "lechuga"},
+		{Codigo: 122, Nombre: "cebolla"},
+		{Codigo: 240, Nombre: "acelga"},
+	}
+
+	producto, err := BuscarProducto(productos, 24)
+	if err == ErrProductoNoEncontrado {
+		fmt.Print("producto no encontrado")
+		return
+	}
+	fmt.Println("Producto encontrado:", producto.Nombre)
+}
+
+//extraer
+package main
+
+import (
+	"fmt"
+)
+
+type SaldoInsuficienteError struct {
+	Saldo float64
+	Monto float64
+}
+
+//var errorSaldo = errors.New("Saldo insuficiente")
+
+// TODO: implementar el método Error() para que SaldoInsuficienteError implemente error
+
+func (s SaldoInsuficienteError) Error() string {
+	return fmt.Sprintf("error el saldo es de %.2f, y el monto pedido es de %.2f\n", s.Monto, s.Saldo)
+}
+
+func Extraer(saldo, monto float64) (float64, error) {
+	if saldo < monto {
+		return saldo, SaldoInsuficienteError{
+			Saldo: saldo,
+			Monto: monto,
+		}
+	}
+	return saldo - monto, nil
+}
+
+func main() {
+	saldoFinal, err := Extraer(100.0, 50.0)
+	if err != nil {
+		fmt.Print(err)
+	} else {
+		fmt.Print("operacion exitosa, el saldo quedo en $", saldoFinal)
+	}
+}
+
+//Leer archivos
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+)
+
+func LeerArchivo(ruta string) (string, error) {
+
+	archivoParaLerr, err := os.Open(ruta)
+	if err != nil {
+		return "", err
+	}
+
+	defer archivoParaLerr.Close()
+	var contenido string
+	scanner := bufio.NewScanner(archivoParaLerr)
+	for scanner.Scan() {
+		contenido += scanner.Text()
+
+	}
+	if err := scanner.Err(); err != nil {
+		return "", err
+	}
+
+	return contenido, nil
+}
+
+func main() {
+	nombreDelArchivo := "_test.txt"
+	contenido := []byte("Hola que tal todo bien?")
+	//os.WriteFile("_test.txt", []byte("hola"), 0644)
+	//defer os.Remove("_test.txt")
+	err := os.WriteFile(nombreDelArchivo, contenido, 0644)
+	if err != nil {
+		fmt.Print("Error al leer el archivo", err)
+		return
+	}
+	defer os.Remove(nombreDelArchivo)
+	resultadoFinal, err := LeerArchivo(nombreDelArchivo)
+	if err != nil {
+		fmt.Println("Error al leer el archivo:", err)
+		return
+	}
+	fmt.Print("Contenido leído:\n", resultadoFinal)
+
+}
