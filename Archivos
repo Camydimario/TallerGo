@@ -1,0 +1,235 @@
+//ContarLineas
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+)
+
+func ContarLineas(archivo string) int {
+
+	archi, err := os.Open(archivo)
+	if err != nil {
+		return 0
+	}
+	defer archi.Close()
+
+	scanner := bufio.NewScanner(archi)
+	contador := 0
+
+	for scanner.Scan() {
+		contador++
+	}
+	if err := scanner.Err(); err != nil {
+		return 0
+	}
+	return contador
+}
+
+func main() {
+	contenido := []byte("linea1\nlinea2\nlinea3\n")
+	os.WriteFile("mi_prueba.txt", contenido, 0644)
+	defer os.Remove("mi_prueba.txt")
+
+	// 2. Probamos la función
+	lineas := ContarLineas("mi_prueba.txt")
+	fmt.Println("Líneas totales:", lineas)
+}
+
+
+//copiar archivos
+package main
+
+import (
+	"fmt"
+	"io"
+	"os"
+)
+
+func CopiarArchivo(origen, destino string) error {
+	archiOrigen, err := os.Open(origen)
+
+	if err != nil {
+		return err
+	}
+	defer archiOrigen.Close()
+	archiDestino, err := os.Create(destino)
+	if err != nil {
+		return err
+	}
+	defer archiDestino.Close()
+
+	// para copiar
+	_, err = io.Copy(archiDestino, archiOrigen)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func main() {
+	os.WriteFile("_origen.txt", []byte("contenido"), 0644)
+	defer os.Remove("_origen.txt")
+	defer os.Remove("_destino.txt")
+	copiar := CopiarArchivo("_origen.txt", "_destino.txt")
+
+	if copiar != nil {
+		fmt.Println("Error al copiar:", copiar)
+	} else {
+		fmt.Println("¡Archivo copiado con éxito! Error:", copiar)
+	}
+}
+
+//Sumar numeros
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strconv"
+)
+
+func SumarNumeros(archivo string) int {
+	archivito, err := os.Open(archivo)
+	if err != nil {
+		return 0
+	}
+
+	defer archivito.Close()
+
+	scanner := bufio.NewScanner(archivito)
+	sumar := 0
+
+	for scanner.Scan() {
+
+		linea := scanner.Text()
+
+		numero, err := strconv.Atoi(linea)
+		if err != nil {
+			continue
+		}
+		if err := scanner.Err(); err != nil {
+			return 0
+		}
+		sumar += numero
+	}
+
+	return sumar
+}
+
+func main() {
+	contenido := []byte("1\n2\n3\n4\n5\n")
+	os.WriteFile("_nums.txt", contenido, 0644)
+	defer os.Remove("_nums.txt")
+	total := SumarNumeros("_nums.txt")
+	fmt.Print("El total es de ", total)
+}
+
+//agregar linea
+package main
+
+import (
+	"fmt"
+	"os"
+)
+
+func AgregarLinea(archivo, linea string) error {
+	archivito, err := os.OpenFile(archivo, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return err
+	}
+	defer archivito.Close()
+
+	//linea := scanner.Text()
+	_, err = fmt.Fprintln(archivito, linea)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func main() {
+
+	err := os.WriteFile("_bitacora.txt", []byte("linea1\n"), 0644)
+	if err != nil {
+		fmt.Println("Error al crear archivo inicial:", err)
+		return
+	}
+
+	defer os.Remove("_bitacora.txt")
+
+	err = AgregarLinea("_bitacora.txt", "linea2")
+	if err != nil {
+		fmt.Println("Error al agregar línea:", err)
+		return
+	}
+
+	fmt.Println("Línea agregada sin problemas")
+}
+
+
+//Numerar lineas
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+)
+
+func NumerarLineas(entrada, salida string) error {
+
+	archivoEntrada, err := os.Open(entrada)
+	if err != nil {
+		return err
+	}
+	defer archivoEntrada.Close()
+
+	archivoSalida, err := os.Create(salida)
+	if err != nil {
+		return err
+
+	}
+	defer archivoSalida.Close()
+
+	scanner := bufio.NewScanner(archivoEntrada)
+	linea := 1
+	for scanner.Scan() {
+
+		_, err := fmt.Fprintf(archivoSalida, "%d: %s\n", linea, scanner.Text())
+		if err != nil {
+			return err
+		}
+		linea++
+	}
+	if err := scanner.Err(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func main() {
+	os.WriteFile("_entrada.txt", []byte("hola\nmundo\n"), 0644)
+	defer os.Remove("_entrada.txt")
+	defer os.Remove("_salida.txt")
+	resultadoEnumerado := NumerarLineas("_entrada.txt", "_salida.txt")
+	//fmt.Print("Enumeracion por linea", resultadoEnumerado)
+
+	if resultadoEnumerado != nil {
+		fmt.Println("Error:", resultadoEnumerado)
+		return
+	}
+
+	// Leemos el archivo generado para ver el resultado en pantalla
+	contenido, err := os.ReadFile("_salida.txt")
+	if err != nil {
+		fmt.Println("Error al leer la salida:", err)
+		return
+	}
+	fmt.Print(string(contenido))
+
+}
+
