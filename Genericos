@@ -1,0 +1,148 @@
+//Busqueda 
+package main
+
+import "fmt"
+
+// Contiene verifica si un elemento está en el slice.
+// Usa el constraint comparable para poder usar ==.
+func Contiene[T comparable](arr []T, elem T) bool {
+	for _, v := range arr {
+		if v == elem {
+
+			return true
+		}
+	}
+	return false
+}
+
+// Posicion devuelve el índice de un elemento en el slice,
+// o -1 si no está.
+func Posicion[T comparable](arr []T, elem T) int {
+	for i, v := range arr {
+		if v == elem {
+			return i
+		}
+	}
+	return -1
+}
+
+func main() {
+	numeros := []int{10, 20, 30, 40, 50, 60}
+	fmt.Print(Contiene(numeros, 30))
+	fmt.Print("\n")
+	fmt.Print(Contiene(numeros, 70))
+	fmt.Print("\n")
+	fmt.Print(Posicion(numeros, 10))
+	fmt.Print("\n")
+	fmt.Print(Posicion(numeros, 32))
+}
+
+// ordenar
+package main
+
+import "fmt"
+
+// OrdenarBurbuja ordena un slice usando el algoritmo de burbujeo.
+// La función menor determina si a debe ir antes que b en el ordenamiento.
+func OrdenarBurbuja[T any](arr []T, menor func(T, T) bool) {
+	n := len(arr)
+	for i := 0; i < n-1; i++ {
+		for j := 0; j < n-1; j++ {
+			if !menor(arr[j], arr[j+1]) {
+				arr[j], arr[j+1] = arr[j+1], arr[j]
+
+			}
+
+		}
+
+	}
+
+}
+func main() {
+	numeros := []int{10, 22, 9, 25, 50, 5}
+	OrdenarBurbuja(numeros, func(a, b int) bool {
+		return a < b
+	})
+	fmt.Print(numeros)
+}
+
+//max min
+package main
+
+import "fmt"
+
+// Ordenable agrupa tipos que soportan operadores de comparación (<, >, etc.)
+type Ordenable interface {
+	~int | ~float64 | ~string
+}
+
+// Maximo devuelve el valor máximo de un slice.
+// El slice debe tener al menos un elemento.
+func Maximo[T Ordenable](arr []T) T {
+	max := arr[0]
+	for _, v := range arr {
+		if v > max {
+			max = v
+		}
+	}
+
+	return max
+}
+
+// Minimo devuelve el valor mínimo de un slice.
+// El slice debe tener al menos un elemento.
+func Minimo[T Ordenable](arr []T) T {
+	min := arr[0]
+	for _, v := range arr {
+		if v < min {
+			min = v
+		}
+	}
+	//var zero T
+	return min
+}
+
+func main() {
+	numeros := []int{2, 4, 6, 8, 10}
+	//Maximo(numeros)
+	fmt.Print("El maximo es: ", Maximo(numeros))
+	fmt.Print("\nEl minimo es: ", Minimo(numeros))
+}
+
+//filtrar 
+package main
+
+import "fmt"
+
+// Filtrar devuelve un nuevo slice con los elementos que cumplen la condición.
+// La función fn recibe un elemento y devuelve true si debe conservarlo.
+func Filtrar[T any](arr []T, fn func(T) bool) []T {
+	// 1. Contamos cuántos elementos cumplen la condición
+	cantidad := 0
+	for _, v := range arr {
+		if fn(v) {
+			cantidad++
+		}
+	}
+
+	filtrar := make([]T, cantidad)
+	marcador := 0
+	for _, v := range arr {
+		if fn(v) {
+			filtrar[marcador] = v
+			marcador++
+		}
+	}
+
+	return filtrar
+}
+
+func main() {
+	numeros := []int{2, 4, 7, 9, 10}
+	numerosFiltrados := Filtrar(numeros, func(a int) bool {
+		return a%2 == 0
+	})
+	fmt.Print("arrays", numeros)
+	fmt.Print("\nArrays con filtrado", numerosFiltrados)
+}
+
