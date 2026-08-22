@@ -1,0 +1,193 @@
+//empleados
+package empleados
+
+type Empleado interface {
+	CalcularSueldo() float64
+	Puesto() string
+	Nombre() string
+}
+
+//Gerente
+package empleados
+
+type Gerente struct {
+	TiempoCompleto
+	bono float64
+}
+
+func NewGerente(nombre string, sueldoMensual float64, bono float64) *Gerente {
+	return &Gerente{
+		TiempoCompleto: TiempoCompleto{
+			nombre:        nombre,
+			sueldoMensual: sueldoMensual,
+		},
+		bono: bono,
+	}
+}
+
+func (e *Gerente) CalcularSueldo() float64 {
+	sueldoFinal := e.sueldoMensual + e.bono
+	return sueldoFinal
+
+}
+
+func (e *Gerente) Puesto() string {
+	//return fmt.Sprintf("El puesto del gerente es el siguiente %s\n", e.puesto)
+	return "Gerente"
+}
+
+
+//mediotiempo
+package empleados
+
+type MedioTiempo struct {
+	nombre          string
+	puesto          string
+	sueldoPorHora   float64
+	horasTrabajadas int
+}
+
+func NewMedioTiempo(nombre string, puesto string, sueldoPorHora float64, horasTrabajadas int) *MedioTiempo {
+	return &MedioTiempo{
+		nombre:          nombre,
+		puesto:          puesto,
+		sueldoPorHora:   sueldoPorHora,
+		horasTrabajadas: horasTrabajadas,
+	}
+
+}
+
+func (e *MedioTiempo) CalcularSueldo() float64 {
+	return e.sueldoPorHora * float64(e.horasTrabajadas)
+}
+
+func (e *MedioTiempo) Puesto() string {
+	//return fmt.Sprintf("el puesto es el siguiente %s \n", e.puesto)
+	return e.puesto
+}
+
+func (e *MedioTiempo) Nombre() string {
+	//return fmt.Sprintf("el nombre es el siguiente %s \n", e.nombre)
+	return e.nombre
+}
+
+
+//comision por hora
+package empleados
+
+import "fmt"
+
+type PorComision struct {
+	nombre             string
+	puesto             string
+	sueldoBase         float64
+	ventasRealizadas   float64
+	porcentajeComision float64
+}
+
+func NewPorComision(nombre string, puesto string, sueldoBase, ventasRealizadas, porcentajeComision float64) *PorComision {
+	return &PorComision{
+		nombre:             nombre,
+		puesto:             puesto,
+		sueldoBase:         sueldoBase,
+		ventasRealizadas:   ventasRealizadas,
+		porcentajeComision: porcentajeComision,
+	}
+
+}
+
+func (e *PorComision) CalcularSueldo() float64 {
+	calculoDeComision := e.ventasRealizadas * (float64(e.porcentajeComision))
+
+	return e.sueldoBase + calculoDeComision
+}
+
+func (e *PorComision) Puesto() string {
+	return fmt.Sprintf("el puesto es el siguiente %s\n", e.puesto)
+}
+
+func (e *PorComision) Nombre() string {
+	return fmt.Sprintf("el nombre es el siguiente %s\n", e.nombre)
+}
+
+//tiempo completo 
+package empleados
+
+type TiempoCompleto struct {
+	nombre        string
+	puesto        string
+	sueldoMensual float64
+}
+
+func NewTiempoCompleto(nombre string, puesto string, sueldoMensual float64) *TiempoCompleto {
+	return &TiempoCompleto{
+		nombre:        nombre,
+		puesto:        puesto,
+		sueldoMensual: sueldoMensual,
+	}
+}
+
+func (e *TiempoCompleto) CalcularSueldo() float64 {
+
+	return e.sueldoMensual
+}
+
+func (e *TiempoCompleto) Puesto() string {
+	//return fmt.Sprintf("el puesto es el siguiente %s\n", e.puesto)
+	return e.puesto
+}
+
+func (e *TiempoCompleto) Nombre() string {
+	//return fmt.Sprintf("Gerente %s\n", e.nombre)
+	return e.nombre
+}
+
+//main 
+package main
+
+import (
+	"fmt"
+
+	"github.com/untref-ayp2/taller-go/11-oop/ejercicios/01-sistema-empleados/empleados"
+)
+
+func TotalSueldos(empleados []empleados.Empleado) float64 {
+	var totalSueldo float64
+	for _, e := range empleados {
+		totalSueldo += e.CalcularSueldo()
+	}
+	return totalSueldo
+}
+
+func EmpleadoConMasResponsabilidad(empleados []empleados.Empleado) string {
+	if len(empleados) == 0 {
+		return ""
+	}
+
+	maximoSueldo := empleados[0].CalcularSueldo()
+	nombreMasResponsable := empleados[0].Nombre()
+
+	for _, e := range empleados {
+		if e.CalcularSueldo() > maximoSueldo {
+			maximoSueldo = e.CalcularSueldo()
+			nombreMasResponsable = e.Nombre()
+		}
+	}
+
+	return nombreMasResponsable
+}
+
+func main() {
+	empleados := []empleados.Empleado{
+		empleados.NewTiempoCompleto("Ana", "Analista", 50000),
+		empleados.NewMedioTiempo("Luis", "Asistente", 1000, 80),
+		empleados.NewPorComision("Carla", "Vendedora", 20000, 100000, 0.15),
+		empleados.NewGerente("Pedro", 80000, 20000),
+	}
+
+	totalSueldo := TotalSueldos(empleados)
+	fmt.Printf("Total de sueldos a pagar: $%.2f\n", totalSueldo)
+
+	emplemasResponsable := EmpleadoConMasResponsabilidad(empleados)
+	fmt.Println("Empleado con más responsabilidad:", emplemasResponsable)
+}
