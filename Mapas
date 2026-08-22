@@ -1,0 +1,109 @@
+//contarPalabras
+package main
+
+import "fmt"
+
+func ContarPalabras(texto string) map[string]int {
+	contar := make(map[string]int)
+	palabra := ""
+	for _, letra := range texto {
+		//contar[string(palabra)]++
+		if letra == ' ' {
+			if palabra != "" {
+				contar[palabra]++
+				palabra = ""
+			}
+		} else {
+			palabra += string(letra)
+		}
+	}
+
+	if palabra != "" {
+		contar[palabra]++
+	}
+
+	return contar
+}
+
+func main() {
+	texto := ContarPalabras("hola como estas")
+	fmt.Print("El total de palabras es: ", texto)
+	// Usá este espacio para probar tu implementación
+}
+
+// igual 
+package main
+
+import "fmt"
+
+func Igual(a, b map[string]int) bool {
+	sumarLetrasMapa1 := 0
+	for _, valor := range a {
+		sumarLetrasMapa1 = sumarLetrasMapa1 + valor
+	}
+
+	sumarLetrasMapa2 := 0
+	for _, valor := range b {
+		sumarLetrasMapa2 = sumarLetrasMapa2 + valor
+	}
+	if sumarLetrasMapa1 == sumarLetrasMapa2 {
+		return true
+	}
+
+	return false
+
+}
+
+func main() {
+	LetrasMapa1 := map[string]int{"a": 1, "b": 2}
+	LetrasMapa2 := map[string]int{"a": 1, "b": 2}
+
+	fmt.Print(Igual(LetrasMapa1, LetrasMapa2))
+
+	LetrasMapa3 := map[string]int{"a": 2, "b": 2, "c": 3}
+	LetrasMapa4 := map[string]int{"a": 1, "b": 2}
+
+	fmt.Print(Igual(LetrasMapa3, LetrasMapa4))
+
+}
+
+//anagrama
+package main
+
+import (
+	"fmt"
+	"strings"
+)
+
+func SonAnagramas(a, b string) bool {
+	a = strings.ToLower(a)
+	b = strings.ToLower(b)
+	contarLetrasMapa1 := make(map[string]int)
+	for _, valor := range a {
+		contarLetrasMapa1[string(valor)]++
+	}
+
+	contarLetrasMapa2 := make(map[string]int)
+	for _, valor := range b {
+		contarLetrasMapa2[string(valor)]++
+	}
+
+	if len(contarLetrasMapa1) != len(contarLetrasMapa2) {
+		return false
+	}
+	for letra, cantidad := range contarLetrasMapa1 {
+		if contarLetrasMapa2[letra] != cantidad {
+			return false
+		}
+	}
+
+	return true
+}
+
+func main() {
+	fmt.Println(SonAnagramas("roma", "amor")) // true
+	fmt.Println(SonAnagramas("hola", "chau")) // false
+
+}
+
+
